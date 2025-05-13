@@ -1,0 +1,5 @@
+train: C:\Users\GANJA SRIVIDYA\Videos\yolov5\train
+val: C:\Users\GANJA SRIVIDYA\Videos\yolov5\val
+
+nc: 1
+names: ["box"]
