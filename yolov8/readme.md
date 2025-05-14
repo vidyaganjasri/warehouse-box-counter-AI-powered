@@ -76,6 +76,9 @@ add the path of the multimedia in place of warehouse.jpg in the source of test.p
 
 Go to your cloned folder yolov8\runs\detect
 
+![warehouse](https://github.com/user-attachments/assets/d255d83f-7d15-4f3a-a9bd-4c442ed3c041)
+
+
 ### 9.To deactivate the virtual environment, simply run:
 
 deactivate
