@@ -2,7 +2,7 @@ import cv2
 from datetime import datetime
 import os
 import shutil
-from tkinter import Tk, filedialog  # 🔁 Added for GUI file selection
+from tkinter import Tk, filedialog  # 🔁 GUI for file selection
 
 class WebcamCapture:
     def __init__(self, output_dir="captures"):
@@ -17,9 +17,10 @@ class WebcamCapture:
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             print("❌ Cannot open webcam")
-            return
+            return None
 
         print("📷 Press SPACE to capture the image. Press ESC to cancel.")
+        filename = None
 
         while True:
             ret, frame = cap.read()
@@ -34,22 +35,24 @@ class WebcamCapture:
                 print("❌ Cancelled.")
                 break
             elif key == 32:  # SPACE
-                filename = f"{self.output_dir}/image_{self.get_timestamp()}.jpg"
+                filename = os.path.join(self.output_dir, f"image_{self.get_timestamp()}.jpg")
                 cv2.imwrite(filename, frame)
-                print(f"✅ Image saved: {filename}")
+                abs_path = os.path.abspath(filename)
+                print(f"✅ Image saved: {abs_path}")
                 break
 
         cap.release()
         cv2.destroyAllWindows()
+        return os.path.abspath(filename) if filename else None
 
     def record_video(self):
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             print("❌ Error: Cannot open webcam")
-            return
+            return None
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        filename = f"{self.output_dir}/video_{self.get_timestamp()}.avi"
+        filename = os.path.join(self.output_dir, f"video_{self.get_timestamp()}.avi")
         out = cv2.VideoWriter(filename, fourcc, 20.0, (640, 480))
 
         print("🎥 Recording started. Press 'q' to stop.")
@@ -70,24 +73,28 @@ class WebcamCapture:
         cap.release()
         out.release()
         cv2.destroyAllWindows()
-        print(f"✅ Video saved as {filename}")
+        abs_path = os.path.abspath(filename)
+        print(f"✅ Video saved as {abs_path}")
+        return abs_path
 
     def upload_image(self):
         print("📂 Select an image file to upload...")
         root = Tk()
-        root.withdraw()  # Hide main tkinter window
+        root.withdraw()
         filetypes = [("Image Files", "*.png *.jpg *.jpeg *.bmp *.gif")]
         source_path = filedialog.askopenfilename(title="Select Image File", filetypes=filetypes)
         root.destroy()
 
         if not source_path:
             print("❌ No file selected.")
-            return
+            return None
 
         ext = os.path.splitext(source_path)[-1]
         dest_path = os.path.join(self.output_dir, f"uploaded_image_{self.get_timestamp()}{ext}")
         shutil.copy(source_path, dest_path)
-        print(f"✅ Image uploaded to: {dest_path}")
+        abs_path = os.path.abspath(dest_path)
+        print(f"✅ Image uploaded to: {abs_path}")
+        return abs_path
 
     def upload_video(self):
         print("📂 Select a video file to upload...")
@@ -99,12 +106,14 @@ class WebcamCapture:
 
         if not source_path:
             print("❌ No file selected.")
-            return
+            return None
 
         ext = os.path.splitext(source_path)[-1]
         dest_path = os.path.join(self.output_dir, f"uploaded_video_{self.get_timestamp()}{ext}")
         shutil.copy(source_path, dest_path)
-        print(f"✅ Video uploaded to: {dest_path}")
+        abs_path = os.path.abspath(dest_path)
+        print(f"✅ Video uploaded to: {abs_path}")
+        return abs_path
 
 def main():
     webcam = WebcamCapture()
@@ -116,16 +125,21 @@ def main():
     print("4. Upload Video")
     choice = input("Enter your choice (1-4): ")
 
+    path = None
     if choice == '1':
-        webcam.capture_image()
+        path = webcam.capture_image()
     elif choice == '2':
-        webcam.record_video()
+        path = webcam.record_video()
     elif choice == '3':
-        webcam.upload_image()
+        path = webcam.upload_image()
     elif choice == '4':
-        webcam.upload_video()
+        path = webcam.upload_video()
     else:
         print("❌ Invalid choice.")
 
+    if path:
+        print(f"📁 File path returned: {path}")
+
 if __name__ == "__main__":
     main()
+
