@@ -2,34 +2,21 @@ import cv2
 import os
 from datetime import datetime
 
+# 🔁 Import the capture/upload tool from Task 1
+from webcam_capture import main as get_input_file
 
-class ImageLoader:
-    def __init__(self, folder="captures"):
-        self.folder = folder
 
-    def get_latest_image_path(self):
-        files = sorted(
-            [f for f in os.listdir(self.folder) if f.lower().endswith(('.jpg', '.jpeg', '.png'))],
-            key=lambda x: os.path.getmtime(os.path.join(self.folder, x)),
-            reverse=True
-        )
-        if not files:
-            print("❌ No image files found in the captures folder.")
-            return None
-        return os.path.join(self.folder, files[0])
+class PreProcessor:
+    def __init__(self):
+        pass  # No need for folder parameter anymore
 
-    def load_image(self):
-        image_path = self.get_latest_image_path()
-        if not image_path:
+    def load_image(self, path):
+        if not path or not os.path.exists(path):
+            print("❌ Invalid image path.")
             return None, None
-        image = cv2.imread(image_path)
-        print(f"📥 Processing image: {image_path}")
-        return image, image_path
-
-
-class PreProcessor(ImageLoader):
-    def __init__(self, folder="captures"):
-        super().__init__(folder)
+        image = cv2.imread(path)
+        print(f"📥 Processing image: {path}")
+        return image, path
 
     def convert_to_grayscale(self, image):
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -63,9 +50,13 @@ class PreProcessor(ImageLoader):
 
 
 def main():
-    processor = PreProcessor()
+    # 🔁 Get input image path from Task 1 (webcam_capture.py)
+    image_path = get_input_file()
+    if image_path is None:
+        return
 
-    image, _ = processor.load_image()
+    processor = PreProcessor()
+    image, _ = processor.load_image(image_path)
     if image is None:
         return
 
