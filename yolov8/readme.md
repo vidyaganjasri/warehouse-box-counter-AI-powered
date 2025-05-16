@@ -1,5 +1,7 @@
 # 📦 Warehouse Box Counter - YOLOv8 Object Detection
 
+please make sure you have opencv-python and ultralytics installed
+
 This project uses YOLOv8 to detect boxes in a warehouse setup. 
 It includes the trained model and all required files to test and run object detection on a custom dataset.
 
