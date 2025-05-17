@@ -2,13 +2,13 @@ import cv2
 import os
 from datetime import datetime
 
-# 🔁 Import the capture/upload tool from Task 1
+# 🔁 Import capture/upload tool from Task 1
 from webcam_capture import main as get_input_file
 
 
 class PreProcessor:
     def __init__(self):
-        pass  # No need for folder parameter anymore
+        pass
 
     def load_image(self, path):
         if not path or not os.path.exists(path):
@@ -40,32 +40,76 @@ class PreProcessor:
 
         return original, box_count
 
-    def annotate_and_show(self, result_img, edges, box_count):
-        cv2.putText(result_img, f"Boxes Detected: {box_count}", (10, 30),
+    def annotate_frame(self, frame, box_count):
+        cv2.putText(frame, f"Boxes Detected: {box_count}", (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        return frame
+
+    def show_results(self, result_img, edges):
         cv2.imshow("Detected Boxes", result_img)
         cv2.imshow("Edges", edges)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+    def process_image(self, image_path):
+        image, _ = self.load_image(image_path)
+        if image is None:
+            return
+
+        original = image.copy()
+        gray = self.convert_to_grayscale(image)
+        blurred = self.apply_blur(gray)
+        edges = self.detect_edges(blurred)
+        result, box_count = self.find_and_draw_boxes(original, edges)
+        annotated = self.annotate_frame(result, box_count)
+        self.show_results(annotated, edges)
+
+    def process_video(self, video_path):
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            print("❌ Failed to open video.")
+            return
+
+        print("📽️ Processing video frames... Press 'q' to quit.")
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            original = frame.copy()
+            gray = self.convert_to_grayscale(frame)
+            blurred = self.apply_blur(gray)
+            edges = self.detect_edges(blurred)
+            result, box_count = self.find_and_draw_boxes(original, edges)
+            annotated = self.annotate_frame(result, box_count)
+
+            cv2.imshow("📦 Boxes in Video", annotated)
+            cv2.imshow("Edges", edges)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
+
 
 def main():
-    # 🔁 Get input image path from Task 1 (webcam_capture.py)
-    image_path = get_input_file()
-    if image_path is None:
+    # Get input file path from Task 1 (webcam capture/upload)
+    path = get_input_file()
+    if not path:
+        print("⚠️ No file path received from Task 1.")
         return
 
     processor = PreProcessor()
-    image, _ = processor.load_image(image_path)
-    if image is None:
-        return
 
-    original = image.copy()
-    gray = processor.convert_to_grayscale(image)
-    blurred = processor.apply_blur(gray)
-    edges = processor.detect_edges(blurred)
-    result, box_count = processor.find_and_draw_boxes(original, edges)
-    processor.annotate_and_show(result, edges, box_count)
+    # Determine if the input is an image or video
+    if path.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+        processor.process_image(path)
+    elif path.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):
+        processor.process_video(path)
+    else:
+        print("❌ Unsupported file format. Please provide an image or video.")
 
 
 if __name__ == "__main__":
