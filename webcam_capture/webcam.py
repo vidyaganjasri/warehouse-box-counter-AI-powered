@@ -121,8 +121,10 @@ def main():
     print("\n📷 Webcam Capture Tool")
     print("1. Capture Image")
     print("2. Record Video")
+    print("3. Upload Image")
+    print("4. Upload Video")
    
-    choice = input("Enter your choice (1-2): ")
+    choice = input("Enter your choice (1-4): ")
 
     path = None
     if choice == '1':
