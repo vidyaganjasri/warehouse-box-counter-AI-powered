@@ -1,8 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath('../WEBCAM_CAPTURE'))
-
-from WEBCAM_CAPTURE.webcam_capture import main as get_input_file
+from webcam_capture import main as get_input_file
 from ultralytics import YOLO
 
 def run_yolo_detection():
