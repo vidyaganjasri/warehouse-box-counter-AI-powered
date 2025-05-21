@@ -1,0 +1,4 @@
+ultralytics
+opencv-python
+Pillow
+tk# For Tkinter GUI; note: use built-in Tkinter for standard Python installations
