@@ -1,6 +1,11 @@
 from ultralytics import YOLO
 import cv2
-import WEBCAM_CAPTURE.webcam_capture 
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from webcam_capture.webcam import main as get_input
+
 # Import webcam_capture directly since it's in the same folder
 
 # ======= PATH CONFIG =======
@@ -87,7 +92,7 @@ elif mode == "2":
 
 elif mode == "3":
     # WEBCAM IMAGE CAPTURE / UPLOAD
-    img_path = WEBCAM_CAPTURE.webcam_capture.main()  # call your webcam_capture script main function
+    img_path = get_input()  # call your webcam_capture script main function
     if img_path:
         frame = cv2.imread(img_path)
         processed_frame, count = process_frame(frame)
@@ -103,7 +108,7 @@ elif mode == "3":
 
 elif mode == "4":
     # WEBCAM VIDEO CAPTURE / UPLOAD
-    video_path = WEBCAM_CAPTURE.webcam_capture.main()  # call your webcam_capture script main function
+    video_path = get_input()  # call your webcam_capture script main function
     if video_path:
         cap = cv2.VideoCapture(video_path)
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
