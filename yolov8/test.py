@@ -1,9 +1,6 @@
 import sys
 import os
-sys.path.append(os.path.abspath('../WEBCAM_CAPTURE'))
-
-from webcam_capture import main as get_input_file
-
+sys.path.append(os.path.abspath('../webcam_capture'))
 
 from webcam import main as get_input_file
 
