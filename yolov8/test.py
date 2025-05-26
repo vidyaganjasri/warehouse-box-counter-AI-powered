@@ -9,6 +9,10 @@ sys.path.append(webcam_path)
 
 # Import webcam_capture module
 from webcam_capture import main as get_input_file
+sys.path.append(os.path.abspath('../webcam_capture'))
+
+from webcam import main as get_input_file
+
 from ultralytics import YOLO
 
 def run_yolo_detection():

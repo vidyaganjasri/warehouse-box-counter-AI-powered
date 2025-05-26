@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # 🔁 Import capture/upload tool from Task 1
-from webcam_capture import main as get_input_file
+from webcam import main as get_input_file
 
 
 class PreProcessor:
