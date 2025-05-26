@@ -4,6 +4,11 @@ import tkinter as tk
 from tkinter import filedialog, Toplevel, messagebox
 from PIL import Image, ImageTk
 import time
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from yolo_module.detect_yolo import detect_boxes
+
 
 SAVE_DIR = "saved_frames"
 os.makedirs(SAVE_DIR, exist_ok=True)
@@ -108,7 +113,8 @@ class WarehouseApp:
             if not self.paused:
                 ret, frame = self.cap.read()
                 if ret:
-                    boxes = [(100, 100, 80, 80)]
+                    boxes = detect_boxes(frame)
+
                     for (x, y, w, h) in boxes:
                         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                     self.current_frame = frame
@@ -151,7 +157,8 @@ class WarehouseApp:
                 self.cap.release()
                 self.status_label.config(text="✅ Uploaded video finished.")
                 return
-            boxes = [(100, 100, 80, 80)]
+            boxes = detect_boxes(frame)
+
             for (x, y, w, h) in boxes:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
             self.current_frame = frame
@@ -176,7 +183,8 @@ class WarehouseApp:
         self.cap = cv2.VideoCapture(0)
         ret, frame = self.cap.read()
         if ret:
-            boxes = [(100, 100, 80, 80)]
+            boxes = detect_boxes(frame)
+
             for (x, y, w, h) in boxes:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 2)
             self.current_frame = frame
@@ -197,7 +205,8 @@ class WarehouseApp:
         path = filedialog.askopenfilename(filetypes=[("Images", "*.jpg *.png *.jpeg")])
         if path:
             img = cv2.imread(path)
-            boxes = [(100, 100, 80, 80)]
+            boxes = detect_boxes(img)
+
             for (x, y, w, h) in boxes:
                 cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
             self.current_frame = img
