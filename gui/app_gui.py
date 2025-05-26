@@ -1,24 +1,18 @@
 import os
 import cv2
 import tkinter as tk
-from tkinter import filedialog, messagebox, Toplevel
+from tkinter import filedialog, Toplevel, messagebox
 from PIL import Image, ImageTk
 import time
 import sys
-from ultralytics import YOLO
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# Add YOLOv8 root to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from yolo_module.detect_yolo import detect_boxes
 
-# === Setup directories ===
+
 SAVE_DIR = "saved_frames"
-CAPTURE_DIR = "yolov8/captures"
-DETECT_DIR = "yolov8/detect"
 os.makedirs(SAVE_DIR, exist_ok=True)
-os.makedirs(CAPTURE_DIR, exist_ok=True)
-os.makedirs(DETECT_DIR, exist_ok=True)
 
-# ======= Styled Button Class =======
 class StyledButton(tk.Button):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -27,7 +21,6 @@ class StyledButton(tk.Button):
                        relief="flat", bd=1, padx=10, pady=5, highlightthickness=0,
                        cursor="hand2")
 
-# ======= Main Application Class =======
 class WarehouseApp:
     def __init__(self, root):
         self.root = root
@@ -36,9 +29,11 @@ class WarehouseApp:
         self.root.configure(bg="#1e1e1e")
 
         self.cap = None
+        self.running = False
+        self.paused = False
         self.current_frame = None
-        self.detected_image_path = None
-        self.box_count = 0
+        self.video_source = None
+        self.is_uploaded_video = False
 
         self._build_ui()
 
@@ -56,6 +51,7 @@ class WarehouseApp:
         self.menu_panel = tk.Frame(self.root, bg="#2c2f33")
         self.menu_panel.place(x=0, y=50, relwidth=0.25, relheight=1)
         self.menu_panel_visible = False
+
         self._add_menu_buttons()
 
         self.display_area = tk.Label(self.root, bg="#111111")
@@ -72,23 +68,28 @@ class WarehouseApp:
         self.control_frame.place(relx=0.3, rely=0.8, width=640, height=50)
         self.control_frame.pack_propagate(False)
 
-        self.capture_btn = StyledButton(self.control_frame, text="📸 Capture Photo", command=self.capture_photo)
-        self.capture_btn.pack(side="left", padx=10)
+        self.play_btn = StyledButton(self.control_frame, text="▶ Start", command=self.handle_play)
+        self.pause_btn = StyledButton(self.control_frame, text="⏸ Pause", command=self.pause_video)
+        self.stop_btn = StyledButton(self.control_frame, text="⏹ Stop", command=self.stop_video)
 
-        self.upload_btn = StyledButton(self.control_frame, text="🖼 Upload Image", command=self.upload_image)
-        self.upload_btn.pack(side="left", padx=10)
-
-        self.detect_btn = StyledButton(self.control_frame, text="🧠 Detect Boxes", command=self.run_yolo_detection)
-        self.detect_btn.pack(side="left", padx=10)
-
-        self.save_btn = StyledButton(self.control_frame, text="💾 Save Image", command=self.save_frame)
+        self.save_btn = StyledButton(self.control_frame, text="💾 Save", command=self.save_frame)
         self.save_btn.pack(side="right", padx=10)
 
         self.quit_btn = StyledButton(self.control_frame, text="❌ Quit", command=self.quit_app)
         self.quit_btn.pack(side="right", padx=10)
 
+        self.retake_btn = StyledButton(self.control_frame, text="🔁 Recapture", command=self.capture_photo)
+
+        self._hide_video_controls()
+
     def _add_menu_buttons(self):
-        options = [("🗂 Saved Frames", self.view_saved_frames)]
+        options = [
+            ("📸 Live Photo", self.capture_photo),
+            ("🎥 Live Video", self.prepare_live_video),
+            ("🖼 Upload Image", self.upload_image),
+            ("🎞 Upload Video", self.prepare_uploaded_video),
+            ("🗂 Saved Frames", self.view_saved_frames)
+        ]
         for (text, cmd) in options:
             btn = StyledButton(self.menu_panel, text=text, command=cmd)
             btn.pack(pady=10, fill="x", padx=10)
@@ -107,69 +108,117 @@ class WarehouseApp:
         self.display_area.imgtk = img
         self.display_area.configure(image=img)
 
-    def capture_photo(self):
+    def update_frame(self):
+        if self.running and self.cap and self.cap.isOpened():
+            if not self.paused:
+                ret, frame = self.cap.read()
+                if ret:
+                    boxes = detect_boxes(frame)
+
+                    for (x, y, w, h) in boxes:
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                    self.current_frame = frame
+                    self._show_frame(frame)
+                    self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
+        if self.running:
+            self.root.after(30, self.update_frame)
+
+    def prepare_live_video(self):
+        self._show_video_controls()
+        self.is_uploaded_video = False
         self.cap = cv2.VideoCapture(0)
-        ret, frame = self.cap.read()
-        self.cap.release()
-        if ret:
-            capture_path = os.path.join(CAPTURE_DIR, "image.jpg")
-            cv2.imwrite(capture_path, frame)
+        self.video_source = "live"
+        self.status_label.config(text="Ready to record from webcam. Click ▶ Start.")
+
+    def prepare_uploaded_video(self):
+        path = filedialog.askopenfilename(filetypes=[("Videos", "*.mp4 *.avi")])
+        if path:
+            self._show_video_controls()
+            self.cap = cv2.VideoCapture(path)
+            self.is_uploaded_video = True
+            self.video_source = path
+            self.status_label.config(text="Ready to play uploaded video. Click ▶ Start.")
+
+    def handle_play(self):
+        if self.cap and self.cap.isOpened():
+            self.running = True
+            self.paused = False
+            self.play_uploaded_video() if self.is_uploaded_video else self.update_frame()
+            source_text = "📹 Playing uploaded video" if self.is_uploaded_video else "🔴 Live recording..."
+            self.status_label.config(text=source_text)
+
+    def play_uploaded_video(self):
+        if not self.running or not self.cap:
+            return
+        if not self.paused:
+            ret, frame = self.cap.read()
+            if not ret:
+                self.running = False
+                self.cap.release()
+                self.status_label.config(text="✅ Uploaded video finished.")
+                return
+            boxes = detect_boxes(frame)
+
+            for (x, y, w, h) in boxes:
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
             self.current_frame = frame
             self._show_frame(frame)
-            self.count_label.config(text="📦 Boxes Detected: 0")
-            self.status_label.config(text="📸 Photo captured and saved.")
-        else:
-            messagebox.showerror("Error", "Failed to capture photo from webcam.")
+            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
+        self.root.after(30, self.play_uploaded_video)
+
+    def pause_video(self):
+        self.paused = not self.paused
+        self.status_label.config(text="⏸ Paused" if self.paused else "▶ Resumed")
+
+    def stop_video(self):
+        self.running = False
+        self.paused = False
+        if self.cap and self.cap.isOpened():
+            self.cap.release()
+        self.status_label.config(text="🛑 Stopped")
+
+    def capture_photo(self):
+        self._hide_video_controls()
+        self._show_recapture_button()
+        self.cap = cv2.VideoCapture(0)
+        ret, frame = self.cap.read()
+        if ret:
+            boxes = detect_boxes(frame)
+
+            for (x, y, w, h) in boxes:
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 2)
+            self.current_frame = frame
+            self._show_frame(frame)
+            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
+            self.status_label.config(text="📸 Photo Captured")
+        self.cap.release()
+
+    def _show_recapture_button(self):
+        self.retake_btn.pack(side="left", padx=10)
+
+    def _hide_recapture_button(self):
+        self.retake_btn.pack_forget()
 
     def upload_image(self):
-        path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-        if not path:
-            return
-        img = cv2.imread(path)
-        if img is None:
-            messagebox.showerror("Error", "Failed to load image.")
-            return
-        capture_path = os.path.join(CAPTURE_DIR, "image.jpg")
-        cv2.imwrite(capture_path, img)
-        self.current_frame = img
-        self._show_frame(img)
-        self.count_label.config(text="📦 Boxes Detected: 0")
-        self.status_label.config(text="🖼 Image uploaded and saved.")
+        self._hide_video_controls()
+        self._hide_recapture_button()
+        path = filedialog.askopenfilename(filetypes=[("Images", "*.jpg *.png *.jpeg")])
+        if path:
+            img = cv2.imread(path)
+            boxes = detect_boxes(img)
 
-    def run_yolo_detection(self):
-        image_path = os.path.join(CAPTURE_DIR, "image.jpg")
-        if not os.path.exists(image_path):
-            messagebox.showwarning("Warning", "No image found to detect. Please capture or upload an image first.")
-            return
-
-        model = YOLO("yolov8n.pt")  # You can replace this with your custom model
-        results = model(image_path)
-        img = cv2.imread(image_path)
-        box_count = 0
-
-        for result in results:
-            boxes = result.boxes.xyxy.cpu().numpy()
-            box_count = len(boxes)
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box[:4])
-                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-        output_path = os.path.join(DETECT_DIR, "detected.jpg")
-        cv2.imwrite(output_path, img)
-        self.current_frame = img
-        self.box_count = box_count
-        self._show_frame(img)
-
-        self.count_label.config(text=f"📦 Boxes Detected: {box_count}")
-        self.status_label.config(text="🧠 Detection completed.")
+            for (x, y, w, h) in boxes:
+                cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            self.current_frame = img
+            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
+            self._show_frame(img)
+            self.status_label.config(text="🖼 Image Loaded")
 
     def save_frame(self):
-        if self.current_frame is None:
-            messagebox.showwarning("Warning", "No frame to save.")
-            return
-        filename = f"{SAVE_DIR}/frame_{int(time.time())}.jpg"
-        cv2.imwrite(filename, self.current_frame)
-        messagebox.showinfo("Saved", f"Frame saved as {filename}")
+        if self.current_frame is not None:
+            filename = f"{SAVE_DIR}/frame_{int(time.time())}.jpg"
+            cv2.imwrite(filename, self.current_frame)
+            messagebox.showinfo("Saved", f"Frame saved as {filename}")
 
     def view_saved_frames(self):
         popup = Toplevel(self.root)
@@ -183,9 +232,9 @@ class WarehouseApp:
             imgtk = ImageTk.PhotoImage(img)
             lbl = tk.Label(popup, image=imgtk, bg="#1e1e1e")
             lbl.image = imgtk
-            lbl.grid(row=i // 5, column=(i % 5) * 2, padx=10, pady=10)
+            lbl.grid(row=i//5, column=(i%5)*2, padx=10, pady=10)
             del_btn = StyledButton(popup, text="❌", command=lambda p=path, w=popup: self._delete_frame(p, w))
-            del_btn.grid(row=i // 5, column=(i % 5) * 2 + 1)
+            del_btn.grid(row=i//5, column=(i%5)*2+1)
 
     def _delete_frame(self, path, win):
         if os.path.exists(path):
@@ -194,11 +243,22 @@ class WarehouseApp:
             win.destroy()
             self.view_saved_frames()
 
+    def _show_video_controls(self):
+        self.play_btn.pack(side="left", padx=10)
+        self.pause_btn.pack(side="left", padx=10)
+        self.stop_btn.pack(side="left", padx=10)
+        self._hide_recapture_button()
+
+    def _hide_video_controls(self):
+        self.play_btn.pack_forget()
+        self.pause_btn.pack_forget()
+        self.stop_btn.pack_forget()
+
     def quit_app(self):
+        self.running = False
         if self.cap and self.cap.isOpened():
             self.cap.release()
         self.root.quit()
-
 
 if __name__ == "__main__":
     root = tk.Tk()
