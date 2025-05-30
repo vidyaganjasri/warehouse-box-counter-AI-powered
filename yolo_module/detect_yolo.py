@@ -9,7 +9,7 @@ def detect_boxes(frame):
     Accepts a BGR image frame.
     Returns a list of bounding boxes in (x, y, w, h) format.
     """
-    results = model.predict(source=frame, conf=0.5, verbose=False)
+    results = model.predict(source=frame, conf=0.85, verbose=False)
 
     boxes = []
     for r in results:
