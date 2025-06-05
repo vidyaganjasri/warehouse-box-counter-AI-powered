@@ -5,35 +5,29 @@ from tkinter import filedialog, Toplevel, messagebox
 from PIL import Image, ImageTk
 import time
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), "..")))
 from yolo_module.detect_yolo import detect_boxes
-
 
 SAVE_DIR = "saved_frames"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 class StyledButton(tk.Button):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
+    def _init_(self, master=None, **kwargs):
+        super()._init_(master, **kwargs)
         self.configure(bg="#2c2f33", fg="white", font=("Helvetica", 12),
                        activebackground="#40444b", activeforeground="#00ffcc",
                        relief="flat", bd=1, padx=10, pady=5, highlightthickness=0,
                        cursor="hand2")
 
 class WarehouseApp:
-    def __init__(self, root):
+    def _init_(self, root):
         self.root = root
         self.root.title("📦 Warehouse Box Detection")
         self.root.geometry("1000x750")
         self.root.configure(bg="#1e1e1e")
 
         self.cap = None
-        self.running = False
-        self.paused = False
         self.current_frame = None
-        self.video_source = None
-        self.is_uploaded_video = False
 
         self._build_ui()
 
@@ -51,7 +45,6 @@ class WarehouseApp:
         self.menu_panel = tk.Frame(self.root, bg="#2c2f33")
         self.menu_panel.place(x=0, y=50, relwidth=0.25, relheight=1)
         self.menu_panel_visible = False
-
         self._add_menu_buttons()
 
         self.display_area = tk.Label(self.root, bg="#111111")
@@ -68,10 +61,6 @@ class WarehouseApp:
         self.control_frame.place(relx=0.3, rely=0.8, width=640, height=50)
         self.control_frame.pack_propagate(False)
 
-        self.play_btn = StyledButton(self.control_frame, text="▶ Start", command=self.handle_play)
-        self.pause_btn = StyledButton(self.control_frame, text="⏸ Pause", command=self.pause_video)
-        self.stop_btn = StyledButton(self.control_frame, text="⏹ Stop", command=self.stop_video)
-
         self.save_btn = StyledButton(self.control_frame, text="💾 Save", command=self.save_frame)
         self.save_btn.pack(side="right", padx=10)
 
@@ -80,14 +69,10 @@ class WarehouseApp:
 
         self.retake_btn = StyledButton(self.control_frame, text="🔁 Recapture", command=self.capture_photo)
 
-        self._hide_video_controls()
-
     def _add_menu_buttons(self):
         options = [
             ("📸 Live Photo", self.capture_photo),
-            ("🎥 Live Video", self.prepare_live_video),
             ("🖼 Upload Image", self.upload_image),
-            ("🎞 Upload Video", self.prepare_uploaded_video),
             ("🗂 Saved Frames", self.view_saved_frames)
         ]
         for (text, cmd) in options:
@@ -108,83 +93,13 @@ class WarehouseApp:
         self.display_area.imgtk = img
         self.display_area.configure(image=img)
 
-    def update_frame(self):
-        if self.running and self.cap and self.cap.isOpened():
-            if not self.paused:
-                ret, frame = self.cap.read()
-                if ret:
-                    boxes = detect_boxes(frame)
-
-                    for (x, y, w, h) in boxes:
-                        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-                    self.current_frame = frame
-                    self._show_frame(frame)
-                    self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
-        if self.running:
-            self.root.after(30, self.update_frame)
-
-    def prepare_live_video(self):
-        self._show_video_controls()
-        self.is_uploaded_video = False
-        self.cap = cv2.VideoCapture(0)
-        self.video_source = "live"
-        self.status_label.config(text="Ready to record from webcam. Click ▶ Start.")
-
-    def prepare_uploaded_video(self):
-        path = filedialog.askopenfilename(filetypes=[("Videos", "*.mp4 *.avi")])
-        if path:
-            self._show_video_controls()
-            self.cap = cv2.VideoCapture(path)
-            self.is_uploaded_video = True
-            self.video_source = path
-            self.status_label.config(text="Ready to play uploaded video. Click ▶ Start.")
-
-    def handle_play(self):
-        if self.cap and self.cap.isOpened():
-            self.running = True
-            self.paused = False
-            self.play_uploaded_video() if self.is_uploaded_video else self.update_frame()
-            source_text = "📹 Playing uploaded video" if self.is_uploaded_video else "🔴 Live recording..."
-            self.status_label.config(text=source_text)
-
-    def play_uploaded_video(self):
-        if not self.running or not self.cap:
-            return
-        if not self.paused:
-            ret, frame = self.cap.read()
-            if not ret:
-                self.running = False
-                self.cap.release()
-                self.status_label.config(text="✅ Uploaded video finished.")
-                return
-            boxes = detect_boxes(frame)
-
-            for (x, y, w, h) in boxes:
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-            self.current_frame = frame
-            self._show_frame(frame)
-            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
-        self.root.after(30, self.play_uploaded_video)
-
-    def pause_video(self):
-        self.paused = not self.paused
-        self.status_label.config(text="⏸ Paused" if self.paused else "▶ Resumed")
-
-    def stop_video(self):
-        self.running = False
-        self.paused = False
-        if self.cap and self.cap.isOpened():
-            self.cap.release()
-        self.status_label.config(text="🛑 Stopped")
-
     def capture_photo(self):
-        self._hide_video_controls()
+        self._hide_recapture_button()
         self._show_recapture_button()
         self.cap = cv2.VideoCapture(0)
         ret, frame = self.cap.read()
         if ret:
             boxes = detect_boxes(frame)
-
             for (x, y, w, h) in boxes:
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 2)
             self.current_frame = frame
@@ -193,26 +108,24 @@ class WarehouseApp:
             self.status_label.config(text="📸 Photo Captured")
         self.cap.release()
 
-    def _show_recapture_button(self):
-        self.retake_btn.pack(side="left", padx=10)
-
-    def _hide_recapture_button(self):
-        self.retake_btn.pack_forget()
-
     def upload_image(self):
-        self._hide_video_controls()
         self._hide_recapture_button()
         path = filedialog.askopenfilename(filetypes=[("Images", "*.jpg *.png *.jpeg")])
         if path:
             img = cv2.imread(path)
             boxes = detect_boxes(img)
-
             for (x, y, w, h) in boxes:
                 cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
             self.current_frame = img
-            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
             self._show_frame(img)
+            self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
             self.status_label.config(text="🖼 Image Loaded")
+
+    def _show_recapture_button(self):
+        self.retake_btn.pack(side="left", padx=10)
+
+    def _hide_recapture_button(self):
+        self.retake_btn.pack_forget()
 
     def save_frame(self):
         if self.current_frame is not None:
@@ -243,24 +156,12 @@ class WarehouseApp:
             win.destroy()
             self.view_saved_frames()
 
-    def _show_video_controls(self):
-        self.play_btn.pack(side="left", padx=10)
-        self.pause_btn.pack(side="left", padx=10)
-        self.stop_btn.pack(side="left", padx=10)
-        self._hide_recapture_button()
-
-    def _hide_video_controls(self):
-        self.play_btn.pack_forget()
-        self.pause_btn.pack_forget()
-        self.stop_btn.pack_forget()
-
     def quit_app(self):
-        self.running = False
         if self.cap and self.cap.isOpened():
             self.cap.release()
         self.root.quit()
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     root = tk.Tk()
     app = WarehouseApp(root)
     root.mainloop()
