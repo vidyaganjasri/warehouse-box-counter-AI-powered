@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 
 # Load the model once when the module is imported
-model = YOLO("yolov8/yolov8m_custom.pt")  # or yolov8n.pt for default testing
+model = YOLO("yolov11/yolov11_custom.pt")  # or yolov8n.pt for default testing
 
 def detect_boxes(frame):
     """
