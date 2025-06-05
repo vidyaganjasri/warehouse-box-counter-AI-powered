@@ -1,4 +1,4 @@
----
+
 
 ````markdown
 # 📦 Warehouse Box Counter - CV Based Application
@@ -68,7 +68,7 @@ warehouse-box-counter-cv/
 ## 🧠 Tech Stack
 
 * **Language:** Python
-* **Model:** YOLOv11 (via Ultralytics)
+* **Model:** YOLOv8 (via Ultralytics)
 * **GUI:** Tkinter
 * **Vision:** OpenCV
 
@@ -85,4 +85,19 @@ warehouse-box-counter-cv/
 
 ---
 
+## 📝 License
 
+This project is not currently licensed. Please contact the maintainers for permissions or contributions.
+
+```
+
+---
+
+Let me know if you want to include:
+
+- Sample screenshots  
+- Demo video link  
+- Setup troubleshooting tips  
+
+I'm happy to help include those too.
+```
