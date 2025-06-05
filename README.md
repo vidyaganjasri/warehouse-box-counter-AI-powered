@@ -3,7 +3,7 @@
 ````markdown
 # 📦 Warehouse Box Counter - CV Based Application
 
-A team project to automatically **detect and count boxes** in warehouse images using **YOLOv8** and **Python GUI**. The system uses live webcam or uploaded images, integrates with a YOLOv8 model, and provides a clean GUI interface for non-technical users.
+A team project to automatically **detect and count boxes** in warehouse images using **YOLOv11** and **Python GUI**. The system uses live webcam or uploaded images, integrates with a YOLOv8 model, and provides a clean GUI interface for non-technical users.
 
 ---
 
@@ -68,7 +68,7 @@ warehouse-box-counter-cv/
 ## 🧠 Tech Stack
 
 * **Language:** Python
-* **Model:** YOLOv8 (via Ultralytics)
+* **Model:** YOLOv11 (via Ultralytics)
 * **GUI:** Tkinter
 * **Vision:** OpenCV
 
@@ -78,26 +78,12 @@ warehouse-box-counter-cv/
 
 * @MANASA-NUKALA
 * @vidyaganjasri
-* @AdulaAnusha22
-* @Sudheshna193
-* @KPRANEETHA-1
 * @MissHaRin19
+* @AdulaAnusha22
+* @KPRANEETHA-1
+* @Sudheshna193
+  
 
 ---
 
-## 📝 License
 
-This project is not currently licensed. Please contact the maintainers for permissions or contributions.
-
-```
-
----
-
-Let me know if you want to include:
-
-- Sample screenshots  
-- Demo video link  
-- Setup troubleshooting tips  
-
-I'm happy to help include those too.
-```
