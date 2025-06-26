@@ -1,36 +1,39 @@
+
 ````markdown
 # Warehouse Box Counter
 
-**Warehouse Box Counter** is a Python-based computer vision project designed to automatically detect and count boxes in warehouse images and videos using a YOLOv11 object detection model.
+The **Warehouse Box Counter** is a computer vision project built with Python that automates the process of detecting and counting boxes in warehouse environments. Using the powerful YOLOv11 object detection algorithm, this tool can process static images, webcam feeds, or video streams to identify boxes, draw bounding boxes around them, and display the total count in real-time. 
+
+The application is designed to be efficient, easy to use, and helpful in industrial settings where manual inventory tracking is time-consuming and error-prone. A simple GUI built with Tkinter makes the tool accessible even to non-technical users.
 
 ---
 
 ## Features
 
-- Object detection using YOLOv11
-- Supports image and webcam
-- Bounding box visualization
-- Total count display of detected boxes
-- User-friendly GUI built with Tkinter
-- Modular code structure for easy maintenance
+- Accurate object detection using YOLOv11
+- Real-time webcam or image input support
+- Bounding box visualization for detected objects
+- Real-time count display of detected boxes
+- User-friendly GUI interface using Tkinter
+- Modular and scalable codebase for easy customization
 
 ---
 
 ## Tech Stack
 
-| Technology   | Purpose                        |
-|--------------|--------------------------------|
-| Python       | Programming language           |
-| YOLOv11      | Object detection               |
-| Tkinter      | Graphical User Interface (GUI) |
-| OpenCV       | Image processing     |
+| Technology | Purpose                        |
+|------------|--------------------------------|
+| Python     | Programming language           |
+| YOLOv11    | Object detection                |
+| Tkinter    | Graphical User Interface (GUI) |
+| OpenCV     | Image and video processing     |
 
 ---
 ````
-
 ## Installation and Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/MANASA-NUKALA/warehouse-box-counter-cv.git
 cd warehouse-box-counter-cv
@@ -89,13 +92,12 @@ warehouse-box-counter-cv/
 
 ## Contributors
 
-* MANASA-NUKALA
-* vidyaganjasri
-* MissHaRin19
-* AdulaAnusha22
-* KPRANEETHA-1
-* Sudheshna193
+* [MANASA-NUKALA](https://github.com/MANASA-NUKALA)
+* [vidyaganjasri](https://github.com/vidyaganjasri)
+* [MissHaRin19](https://github.com/MissHaRin19)
+* [AdulaAnusha22](https://github.com/AdulaAnusha22)
+* [KPRANEETHA-1](https://github.com/KPRANEETHA-1)
+* [Sudheshna193](https://github.com/Sudheshna193)
 
 ---
-```
 ```
