@@ -5,22 +5,26 @@ from tkinter import filedialog, Toplevel, messagebox
 from PIL import Image, ImageTk
 import time
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(_file_), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from yolo_module.detect_yolo import detect_boxes
 
 SAVE_DIR = "saved_frames"
 os.makedirs(SAVE_DIR, exist_ok=True)
 
+LABEL_COLOR = (0, 255, 0)  # Bright green
+TEXT_COLOR = (0, 255, 255)  # Yellowish
+THICKNESS = 2  # Fixed thickness for all labels
+
 class StyledButton(tk.Button):
-    def _init_(self, master=None, **kwargs):
-        super()._init_(master, **kwargs)
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
         self.configure(bg="#2c2f33", fg="white", font=("Helvetica", 12),
                        activebackground="#40444b", activeforeground="#00ffcc",
                        relief="flat", bd=1, padx=10, pady=5, highlightthickness=0,
                        cursor="hand2")
 
 class WarehouseApp:
-    def _init_(self, root):
+    def __init__(self, root):
         self.root = root
         self.root.title("📦 Warehouse Box Detection")
         self.root.geometry("1000x750")
@@ -61,7 +65,7 @@ class WarehouseApp:
         self.control_frame.place(relx=0.3, rely=0.8, width=640, height=50)
         self.control_frame.pack_propagate(False)
 
-        self.save_btn = StyledButton(self.control_frame, text="💾 Save", command=self.save_frame)
+        self.save_btn = StyledButton(self.control_frame, text="📂 Save", command=self.save_frame)
         self.save_btn.pack(side="right", padx=10)
 
         self.quit_btn = StyledButton(self.control_frame, text="❌ Quit", command=self.quit_app)
@@ -73,7 +77,7 @@ class WarehouseApp:
         options = [
             ("📸 Live Photo", self.capture_photo),
             ("🖼 Upload Image", self.upload_image),
-            ("🗂 Saved Frames", self.view_saved_frames)
+            ("📂 Saved Frames", self.view_saved_frames)
         ]
         for (text, cmd) in options:
             btn = StyledButton(self.menu_panel, text=text, command=cmd)
@@ -100,8 +104,11 @@ class WarehouseApp:
         ret, frame = self.cap.read()
         if ret:
             boxes = detect_boxes(frame)
-            for (x, y, w, h) in boxes:
-                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 2)
+            for (x, y, w, h, cls_id, conf) in boxes:
+                label = f"box {conf:.2f}"
+                cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.6, TEXT_COLOR, THICKNESS)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), LABEL_COLOR, THICKNESS)
             self.current_frame = frame
             self._show_frame(frame)
             self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
@@ -114,8 +121,11 @@ class WarehouseApp:
         if path:
             img = cv2.imread(path)
             boxes = detect_boxes(img)
-            for (x, y, w, h) in boxes:
-                cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            for (x, y, w, h, cls_id, conf) in boxes:
+                label = f"box {conf:.2f}"
+                cv2.putText(img, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.6, TEXT_COLOR, THICKNESS)
+                cv2.rectangle(img, (x, y), (x + w, y + h), LABEL_COLOR, THICKNESS)
             self.current_frame = img
             self._show_frame(img)
             self.count_label.config(text=f"📦 Boxes Detected: {len(boxes)}")
@@ -161,7 +171,7 @@ class WarehouseApp:
             self.cap.release()
         self.root.quit()
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     root = tk.Tk()
     app = WarehouseApp(root)
     root.mainloop()
