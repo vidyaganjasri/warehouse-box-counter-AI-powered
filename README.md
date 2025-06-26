@@ -2,9 +2,11 @@
 ````markdown
 # 📦 Warehouse Box Counter – A Computer Vision Project
 
-**Warehouse Box Counter** is a beginner-friendly tool that automatically **detects and counts boxes** in warehouse environments using **YOLOv11** and a simple **Python GUI**.
+**Warehouse Box Counter** is a Python-based computer vision project designed to automatically **detect and count boxes** in warehouse images and videos using the **YOLOv11** object detection model.
 
-You can upload an image, use a webcam, or process a video — the application highlights detected boxes and shows the total count instantly.
+This project was developed by a team of students to simplify and automate inventory estimation in warehouse settings. It works with **images, webcam input, or video streams** and visually marks each detected box with bounding boxes while also displaying the total count — all through a clean and interactive graphical interface built with **Tkinter**.
+
+Whether you're experimenting with object detection, learning computer vision, or building smart warehouse applications — this project serves as a practical example of how AI can streamline real-world logistics.
 
 ---
 
@@ -28,14 +30,14 @@ cd warehouse-box-counter-cv
 
 ### 2. Create a Virtual Environment
 
-#### Windows:
+#### For Windows:
 
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-#### macOS/Linux:
+#### For macOS/Linux:
 
 ```bash
 python3 -m venv venv
@@ -61,7 +63,6 @@ python app_gui.py
 
 ```
 warehouse-box-counter-cv/
-│
 ├── box/                  → Model weights or checkpoint files
 ├── box_counter/          → Core logic to count boxes
 ├── gui/                  → Graphical interface (launch app_gui.py here)
@@ -99,4 +100,5 @@ warehouse-box-counter-cv/
 * [@Sudheshna193](https://github.com/Sudheshna193)
 
 ```
+---
 ```
