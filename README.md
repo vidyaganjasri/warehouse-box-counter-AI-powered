@@ -1,27 +1,26 @@
-
 ````markdown
-# 📦 Warehouse Box Counter – A Computer Vision Project
+# Warehouse Box Counter – A Computer Vision Project
 
-**Warehouse Box Counter** is a Python-based computer vision project designed to automatically **detect and count boxes** in warehouse images and videos using the **YOLOv11** object detection model.
+**Warehouse Box Counter** is a Python-based computer vision project that automatically detects and counts boxes in warehouse images and videos using the YOLOv11 object detection model.
 
-This project was developed by a team of students to simplify and automate inventory estimation in warehouse settings. It works with **images, webcam input, or video streams** and visually marks each detected box with bounding boxes while also displaying the total count — all through a clean and interactive graphical interface built with **Tkinter**.
+Developed by a team of students, the project aims to simplify inventory estimation in warehouse environments. It supports detection from images, webcam input, and video streams. Each box is highlighted with bounding boxes and the total count is displayed through an intuitive graphical interface built with Tkinter.
 
-Whether you're experimenting with object detection, learning computer vision, or building smart warehouse applications — this project serves as a practical example of how AI can streamline real-world logistics.
-
----
-
-## ✨ Features
-
-- 📷 Detect boxes from webcam, images, or videos  
-- 🧠 YOLOv11-based object detection  
-- 🎯 Display bounding boxes and total count  
-- 🖥️ Easy-to-use interface with Tkinter GUI  
+This project is a practical example of how artificial intelligence and computer vision can assist in real-world logistics and automation tasks.
 
 ---
 
-## 🚀 How to Run
+## Features
 
-### 1. Clone the Repository
+- Detect boxes from webcam, images, or videos  
+- YOLOv11-based object detection  
+- Displays bounding boxes and total count  
+- Simple user interface using Tkinter GUI  
+
+---
+
+### How to Run
+
+#### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/MANASA-NUKALA/warehouse-box-counter-cv.git
@@ -59,7 +58,7 @@ python app_gui.py
 
 ---
 
-## 📁 Folder Structure
+## Project Structure
 
 ```
 warehouse-box-counter-cv/
@@ -79,18 +78,18 @@ warehouse-box-counter-cv/
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
-| Tool/Tech | Purpose              |
-| --------- | -------------------- |
-| Python    | Programming Language |
-| YOLOv11   | Object Detection     |
-| Tkinter   | GUI Framework        |
-| OpenCV    | Image Processing     |
+| Technology | Purpose              |
+| ---------- | -------------------- |
+| Python     | Programming language |
+| YOLOv11    | Object detection     |
+| Tkinter    | GUI framework        |
+| OpenCV     | Image processing     |
 
 ---
 
-## 👩‍💻 Contributors
+## Contributors
 
 * [@MANASA-NUKALA](https://github.com/MANASA-NUKALA)
 * [@vidyaganjasri](https://github.com/vidyaganjasri)
@@ -99,6 +98,6 @@ warehouse-box-counter-cv/
 * [@KPRANEETHA-1](https://github.com/KPRANEETHA-1)
 * [@Sudheshna193](https://github.com/Sudheshna193)
 
-```
+````
 ---
-```
+````
