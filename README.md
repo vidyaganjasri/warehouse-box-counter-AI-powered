@@ -87,6 +87,15 @@ warehouse-box-counter-cv/
 ├── requirements.txt      # Python dependencies
 └── README.md             # Project documentation
 ```
+---
+
+## 🎥 Demo Output
+
+The following demo shows the real-time object detection and box counting using the application:
+
+![Demo Output](demo.gif)
+
+---
 
 ---
 
