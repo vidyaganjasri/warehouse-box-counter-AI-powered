@@ -1,11 +1,15 @@
 from ultralytics import YOLO
-import cv2
 import os
 
-# Load the model from correct absolute path using raw string
-#model = YOLO(r'C:\Users\GANJA SRIVIDYA\Music\warehouse-box-counter-cv\yolo_module\best.pt')
-model = YOLO(r'C:\Users\GANJA SRIVIDYA\Documents\kaggle\working\runs\detect\train2\weights\best.pt')
+# Get absolute path to current script (detect_yolo.py)
+base_dir = os.path.dirname(os.path.dirname(__file__))  # Go up one level to project root
+model_path = os.path.join(base_dir, "yolo_module", "best.pt")
 
+# Check and load
+if not os.path.exists(model_path):
+    raise FileNotFoundError(f"'best.pt' not found at: {model_path}")
+
+model = YOLO(model_path)  # ✅ Proper model object
 
 def detect_boxes(frame):
     """

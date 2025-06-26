@@ -1,0 +1,5 @@
+train: /kaggle/input/carton-in-warehouse/train/images
+val: /kaggle/input/carton-in-warehouse/valid/images
+
+nc: 1
+names: ['box']
