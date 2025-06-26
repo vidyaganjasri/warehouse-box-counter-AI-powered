@@ -1,4 +1,3 @@
----
 
 ````markdown
 # 📦 Warehouse Box Counter – A Computer Vision Project
@@ -99,9 +98,5 @@ warehouse-box-counter-cv/
 * [@KPRANEETHA-1](https://github.com/KPRANEETHA-1)
 * [@Sudheshna193](https://github.com/Sudheshna193)
 
----
-
 ```
-
-
 ```
