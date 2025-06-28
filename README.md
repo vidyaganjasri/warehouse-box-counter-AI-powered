@@ -93,7 +93,8 @@ warehouse-box-counter-cv/
 
 The following demo shows the real-time object detection and box counting using the application:
 
-![Demo Output](demo.gif)
+👉 [**Click here to watch the full demo video (MP4)**](https://github.com/MANASA-NUKALA/warehouse-box-counter-cv/raw/main/demo.mp4)
+
 
 ---
 
