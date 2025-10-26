@@ -23,7 +23,7 @@ The application is designed to be efficient, easy to use, and helpful in industr
 | Technology | Purpose                        |
 |------------|--------------------------------|
 | Python     | Programming language           |
-| YOLOv11    | Object detection                |
+| YOLOv8     | Object detection                |
 | Tkinter    | Graphical User Interface (GUI) |
 | OpenCV     | Image and video processing     |
 
